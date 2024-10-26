@@ -6,17 +6,20 @@ Player can draw and discard tile.
 
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.List;
 
 public class Player {
     private final ArrayList<Tile> hand;
     private final ArrayList<Tile> discard;
     private final ArrayList<Tile> played;
     private int selectedTile = 0;
+    private final String playerName;
 
-    public Player() {
+    public Player(String playerName) {
         hand = new ArrayList<>();
         discard = new ArrayList<>();
         played = new ArrayList<>();
+        this.playerName = playerName;
     }
 
     public void initializeHand(TileSet tileset) {
@@ -44,20 +47,60 @@ public class Player {
         return played;
     }
 
-    public void playFlowers() {
-        // Loop through the hand in reverse to avoid concurrent modification issues
+    public String getPlayerName() {
+        return playerName;
+    }
+
+    public boolean hasFlower() {
+        // Loop through the hand and check if any tile is a flower
+        for (Tile tile : hand) {
+            if (tile.isFlower()) {
+                return true;  // Return true as soon as a flower is found
+            }
+        }
+        return false;  // No flowers found
+    }
+
+
+    public void playFlowers(TileSet tileSet) {
+        // Loop through the hand in reverse to safely remove flowers
         for (int i = hand.size() - 1; i >= 0; i--) {
             Tile tile = hand.get(i);
             if (tile.isFlower()) {
-                // Remove the tile from the hand and add it to the played list
-                hand.remove(i);
+                // Move the flower tile to played, remove from hand
                 played.add(tile);
+                hand.remove(i);
+
+                // Draw a replacement tile, ensuring it is not a flower
+                drawTile(tileSet);
             }
         }
     }
 
+    public List<Integer> hasFours(){
+        // loop through the sorted hand, find a set of four of the same, return the where the set ends
+        List<Integer> sets = new ArrayList<>();
+        for(int i = 3; i < hand.size(); i++){
+            if (hand.get(i).equals(hand.get(i - 1)) &&
+                    hand.get(i).equals(hand.get(i - 2)) &&
+                    hand.get(i).equals(hand.get(i - 3))) {
+                sets.add(i);
+            }
+        }
+        return sets;
+    }
+
+    // Draw a tile from the tile set, and if it's a flower, play it and draw another
     public void drawTile(TileSet tileSet) {
-        hand.add(tileSet.drawTile());
+        Tile drawnTile = tileSet.drawTile();
+        while (drawnTile != null && drawnTile.isFlower()) {
+            // If the drawn tile is a flower, play it and draw another tile
+            played.add(drawnTile);
+            drawnTile = tileSet.drawTile();  // Keep drawing until it's not a flower
+        }
+        if (drawnTile != null) {
+            hand.add(drawnTile);  // Add the non-flower tile to the hand
+        }
     }
 
     public void discardTile(int selectedTile){
