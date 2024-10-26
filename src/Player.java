@@ -1,6 +1,11 @@
 /*
 Player has a hand of 16 tiles.
 Player can draw and discard tile.
+Flower tiles are played and redrawn.
+Four tile sets are marked.
+
+TODO:
+pong functions, chi functions (maybe have a separate game engine class to handle these)
  */
 
 
@@ -90,8 +95,9 @@ public class Player {
         return sets;
     }
 
-    // Draw a tile from the tile set, and if it's a flower, play it and draw another
+
     public void drawTile(TileSet tileSet) {
+        // Draw a tile from the tile set, and if it's a flower, play it and draw another
         Tile drawnTile = tileSet.drawTile();
         while (drawnTile != null && drawnTile.isFlower()) {
             // If the drawn tile is a flower, play it and draw another tile
@@ -104,6 +110,7 @@ public class Player {
     }
 
     public void discardTile(int selectedTile){
+        // This will add a tile to discard pile and remove it from hand
         discard.add(hand.get(selectedTile));
         hand.remove(selectedTile);
     }

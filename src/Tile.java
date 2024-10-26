@@ -83,6 +83,7 @@ public class Tile {
 
     @Override
     public String toString() {
+        // to be honest might redo this class or even take it out once gui is set up.
         if (suit == Suit.MILLION){
             return chinese_numbers.values()[value] + " " + "萬";
         }
